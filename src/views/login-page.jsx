@@ -3,8 +3,8 @@ import { Link } from 'react-router-dom';
 export default function LoginPage() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-blue-900">
-      <div className="bg-white p-8 rounded shadow-md w-96">
-        <h2 className="text-2xl font-semibold mb-4">Welcome</h2>
+      <div className="bg-white p-8 rounded shadow-md w-[450px]">
+        <h2 className="text-2xl font-semibold mb-4 mt-2">Welcome</h2>
         <div className="mb-4">
           <label
             htmlFor="username"
@@ -17,7 +17,7 @@ export default function LoginPage() {
             id="username"
             name="username"
             className="mt-1 p-2 w-full border rounded-md"
-            placeholder="Enter your username"
+            placeholder="Enter username"
           />
         </div>
         <div className="mb-6">
@@ -32,7 +32,7 @@ export default function LoginPage() {
             id="password"
             name="password"
             className="mt-1 p-2 w-full border rounded-md"
-            placeholder="Enter your password"
+            placeholder="Enter password"
           />
         </div>
         <div className="flex justify-between items-center">
