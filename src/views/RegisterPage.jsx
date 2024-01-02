@@ -1,7 +1,9 @@
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
+import ImageUploader from '../common/ImageUploader';
 
 const schema = yup.object().shape({
   email: yup
@@ -24,19 +26,53 @@ const schema = yup.object().shape({
     .min(2, 'Last name must have at least 2 characters')
     .max(25, "Last name can't exceed 25 characters")
     .required('Last name is required'),
+  role: yup.string().required('Role is required'),
 });
 
 export default function SignupPage() {
   const {
     register,
-    formState: { errors, isValid },
+    formState: { errors },
     handleSubmit,
   } = useForm({
     resolver: yupResolver(schema),
   });
+  const [imagesData, setImagesData] = useState([]);
+  const [avatar, setAvatar] = useState(null);
+  console.log('🚀 ~ SignupPage ~ avatar:', avatar);
+  console.log('🚀 ~ SignupPage ~ imagesData:', imagesData);
 
-  function onSubmit(data) {
-    console.log('🚀 ~ onSubmit ~ data:', data);
+  function onImageChange(data) {
+    setImagesData(
+      data.map((image) => ({
+        data_url: image.data_url,
+        name: image.file.name,
+        type: image.file.type,
+      }))
+    );
+  }
+
+  function onAvatarChange(event) {
+    const file = event.target.files[0];
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      const base64String = reader.result;
+      setAvatar(base64String);
+    };
+    if (file) {
+      reader.readAsDataURL(file);
+    }
+  }
+
+  async function onSubmit(data) {
+    const result = await fetch(`${process.env.REACT_APP_API_URL}/register`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ ...data, photos: imagesData }),
+    }).then((response) => response.json());
+    console.log('🚀 ~ onSubmit ~ result:', result);
   }
 
   return (
@@ -135,13 +171,22 @@ export default function SignupPage() {
             >
               Role
             </label>
-            <input
-              type="text"
+            <select
+              {...register('role')}
               id="role"
               name="role"
               className="mt-1 p-2 w-full border rounded-md"
-              placeholder="Enter role"
-            />
+            >
+              <option value="">Select role</option>
+              <option value="admin">Admin</option>
+              <option value="manager">Manager</option>
+              <option value="user">User</option>
+            </select>
+            {errors.role && (
+              <p role="alert" className="text-sm text-red-400 mt-1">
+                {errors.role.message}
+              </p>
+            )}
           </div>
           <div className="mb-4">
             <label
@@ -156,7 +201,11 @@ export default function SignupPage() {
               name="avatar"
               accept="image/*"
               className="mt-1 p-2 w-full border rounded-md"
+              onChange={onAvatarChange}
             />
+          </div>
+          <div className="mb-4">
+            <ImageUploader onImageChange={onImageChange} images={imagesData} />
           </div>
           <div className="flex justify-between items-center">
             <button

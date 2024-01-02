@@ -1,8 +1,8 @@
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import LoginPage from './views/login-page';
-import RegisterPage from './views/register-page';
-import ProfilePage from './views/profile-page';
-import NotFoundPage from './views/404-page';
+import LoginPage from './views/LoginPage';
+import RegisterPage from './views/RegisterPage';
+import ProfilePage from './views/ProfilePage';
+import NotFoundPage from './views/NotFoundPage';
 
 const demoUser = {
   id: 1,
