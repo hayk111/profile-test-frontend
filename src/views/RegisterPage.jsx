@@ -1,9 +1,12 @@
 import React, { useState } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
-import ImageUploader from '../common/ImageUploader';
+import RegisterFirstPart from '../components/register/RegisterFirstPart';
+import RegisterSecondPart from '../components/register/RegisterSecondPart';
+import { setFirstRegisterPart } from '../redux/slices/registerSlice';
 
 const schema = yup.object().shape({
   email: yup
@@ -29,6 +32,8 @@ const schema = yup.object().shape({
   role: yup.string().required('Role is required'),
 });
 
+const fileDataPartsRegex = /data:([^\/]+)\/([^;]+);base64,(.+)/;
+
 export default function SignupPage() {
   const {
     register,
@@ -38,18 +43,33 @@ export default function SignupPage() {
     resolver: yupResolver(schema),
   });
   const [imagesData, setImagesData] = useState([]);
-  const [avatar, setAvatar] = useState(null);
-  console.log('🚀 ~ SignupPage ~ avatar:', avatar);
   console.log('🚀 ~ SignupPage ~ imagesData:', imagesData);
+  const [avatar, setAvatar] = useState(null);
+  const { isFirstRegisterPartComplete, ...registerFirstPartData } = useSelector(
+    (state) => state.register
+  );
+  console.log(
+    '🚀 ~ SignupPage ~ registerFirstPartData:',
+    registerFirstPartData
+  );
+  const dispatch = useDispatch();
 
   function onImageChange(data) {
     setImagesData(
-      data.map((image) => ({
-        data_url: image.data_url,
-        name: image.file.name,
-        type: image.file.type,
-      }))
+      data.map((image) => {
+        const [, , , base64Data] = fileDataPartsRegex.exec(image.data_url);
+        return {
+          data_url: image.data_url,
+          base64Data: base64Data,
+          name: image.file?.name,
+          type: image.file?.type,
+        };
+      })
     );
+  }
+
+  function onImageRemove(index) {
+    setImagesData(imagesData.filter((_, i) => i !== index));
   }
 
   function onAvatarChange(event) {
@@ -64,156 +84,66 @@ export default function SignupPage() {
     }
   }
 
+  function goBack() {
+    dispatch(
+      setFirstRegisterPart({
+        ...registerFirstPartData,
+        isFirstRegisterPartComplete: false,
+      })
+    );
+  }
+
   async function onSubmit(data) {
-    const result = await fetch(`${process.env.REACT_APP_API_URL}/register`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ ...data, photos: imagesData }),
-    }).then((response) => response.json());
-    console.log('🚀 ~ onSubmit ~ result:', result);
+    console.log('🚀 ~ onSubmit ~ data:', data, isFirstRegisterPartComplete);
+    if (isFirstRegisterPartComplete) {
+      const result = await fetch(`${process.env.REACT_APP_API_URL}/register`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ ...registerFirstPartData, photos: imagesData }),
+      }).then((response) => response.json());
+      console.log('🚀 ~ onSubmit ~ result:', result);
+    } else {
+      dispatch(
+        setFirstRegisterPart({ ...data, isFirstRegisterPartComplete: true })
+      );
+    }
   }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-blue-900">
-      <div className="bg-white p-8 rounded shadow-md w-[450px]">
+      <div className="bg-white p-8 rounded shadow-md w-[500px]">
         <h2 className="text-2xl font-semibold mb-4 mt-2">Create an Account</h2>
         <form onSubmit={handleSubmit(onSubmit)}>
-          <div className="mb-4">
-            <label
-              htmlFor="email"
-              className="block text-sm font-medium text-gray-700"
-            >
-              Email
-            </label>
-            <input
-              {...register('email')}
-              type="email"
-              id="email"
-              name="email"
-              className="mt-1 p-2 w-full border rounded-md"
-              placeholder="Enter email"
+          {isFirstRegisterPartComplete ? (
+            <RegisterSecondPart
+              imagesData={imagesData}
+              onAvatarChange={onAvatarChange}
+              onImageChange={onImageChange}
+              onImageRemove={onImageRemove}
             />
-            {errors.email && (
-              <p role="alert" className="text-sm text-red-400 mt-1">
-                {errors.email.message}
-              </p>
-            )}
-          </div>
-          <div className="mb-4">
-            <label
-              htmlFor="password"
-              className="block text-sm font-medium text-gray-700"
-            >
-              Password
-            </label>
-            <input
-              {...register('password')}
-              type="password"
-              id="password"
-              name="password"
-              className="mt-1 p-2 w-full border rounded-md"
-              placeholder="Enter password"
-            />
-            {errors.password && (
-              <p role="alert" className="text-sm text-red-400 mt-1">
-                {errors.password.message}
-              </p>
-            )}
-          </div>
-          <div className="mb-4">
-            <label
-              htmlFor="firstName"
-              className="block text-sm font-medium text-gray-700"
-            >
-              First Name
-            </label>
-            <input
-              {...register('firstName')}
-              type="text"
-              id="firstName"
-              name="firstName"
-              className="mt-1 p-2 w-full border rounded-md"
-              placeholder="Enter first name"
-            />
-            {errors.firstName && (
-              <p role="alert" className="text-sm text-red-400 mt-1">
-                {errors.firstName.message}
-              </p>
-            )}
-          </div>
-          <div className="mb-4">
-            <label
-              htmlFor="lastName"
-              className="block text-sm font-medium text-gray-700"
-            >
-              Last Name
-            </label>
-            <input
-              {...register('lastName')}
-              type="text"
-              id="lastName"
-              name="lastName"
-              className="mt-1 p-2 w-full border rounded-md"
-              placeholder="Enter last name"
-            />
-            {errors.lastName && (
-              <p role="alert" className="text-sm text-red-400 mt-1">
-                {errors.lastName.message}
-              </p>
-            )}
-          </div>
-          <div className="mb-4">
-            <label
-              htmlFor="role"
-              className="block text-sm font-medium text-gray-700"
-            >
-              Role
-            </label>
-            <select
-              {...register('role')}
-              id="role"
-              name="role"
-              className="mt-1 p-2 w-full border rounded-md"
-            >
-              <option value="">Select role</option>
-              <option value="admin">Admin</option>
-              <option value="manager">Manager</option>
-              <option value="user">User</option>
-            </select>
-            {errors.role && (
-              <p role="alert" className="text-sm text-red-400 mt-1">
-                {errors.role.message}
-              </p>
-            )}
-          </div>
-          <div className="mb-4">
-            <label
-              htmlFor="avatar"
-              className="block text-sm font-medium text-gray-700"
-            >
-              Avatar
-            </label>
-            <input
-              type="file"
-              id="avatar"
-              name="avatar"
-              accept="image/*"
-              className="mt-1 p-2 w-full border rounded-md"
-              onChange={onAvatarChange}
-            />
-          </div>
-          <div className="mb-4">
-            <ImageUploader onImageChange={onImageChange} images={imagesData} />
-          </div>
+          ) : (
+            <RegisterFirstPart register={register} errors={errors} />
+          )}
           <div className="flex justify-between items-center">
-            <button
-              type="submit"
-              className="bg-blue-500 text-white px-4 py-2 rounded-md"
-            >
-              Sign Up
-            </button>
+            <div className="flex">
+              {isFirstRegisterPartComplete && (
+                <button
+                  type="button"
+                  className="bg-gray-500 text-white mr-2 px-4 py-2 rounded-md"
+                  onClick={goBack}
+                >
+                  Back
+                </button>
+              )}
+              <button
+                type="submit"
+                className="bg-blue-500 text-white px-4 py-2 rounded-md"
+              >
+                {isFirstRegisterPartComplete ? 'Sign Up' : 'Next'}
+              </button>
+            </div>
             <span className="text-sm text-gray-600">
               Already have an account?{' '}
               <Link to="/login" className="text-blue-500">

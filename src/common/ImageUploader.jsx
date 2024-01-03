@@ -7,6 +7,7 @@ import classes from './ImageUploader.module.css';
 function ImageUploader({
   images = [],
   onImageChange,
+  onImageRemove,
   maxImageNumber = 10,
   acceptTypes = ['jpg', 'jpeg', 'gif', 'png'],
 }) {
@@ -23,13 +24,11 @@ function ImageUploader({
         imageList,
         onImageUpload,
         onImageRemoveAll,
-        onImageRemove,
         isDragging,
         dragProps,
       }) => (
-        // write your building UI
-        <div className="image-uploader-container flex flex-col w-1/2">
-          <div className="image-uploader-actions flex flex-col items-center mb-10">
+        <div className="image-uploader-container flex flex-col">
+          <div className="image-uploader-actions flex flex-col items-center mb-6">
             <button
               className={clsx(
                 classes['image-uploader__button-upload'],
@@ -57,31 +56,34 @@ function ImageUploader({
               Remove all images
             </button>
           </div>
-          <div className={classes['image-uploader-images']}>
-            {imageList.map((image, index) => (
-              <div key={index} className={classes['image-uploader-image']}>
-                <img
-                  src={image.url || image.data_url}
-                  className={clsx(classes['image-uploader__image'], 'mb-4')}
-                  width={120}
-                  alt=""
-                />
-                <div className="flex image-uploader-btn-wrapper mb-4">
-                  <button
-                    className={clsx(
-                      classes['image-uploader__image-remove'],
-                      'ml-4'
-                    )}
-                    onClick={(event) => {
-                      event.preventDefault();
-                    }}
-                  >
-                    Remove
-                  </button>
+          {imageList?.length > 0 && (
+            <div className={classes['image-uploader-images']}>
+              {imageList.map((image, index) => (
+                <div key={index} className={classes['image-uploader-image']}>
+                  <img
+                    src={image.url || image.data_url}
+                    className={clsx(classes['image-uploader__image'], 'mb-4')}
+                    width={120}
+                    alt=""
+                  />
+                  <div className="flex image-uploader-btn-wrapper mb-4">
+                    <button
+                      className={clsx(
+                        classes['image-uploader__image-remove'],
+                        'ml-4'
+                      )}
+                      onClick={(event) => {
+                        event.preventDefault();
+                        onImageRemove(index);
+                      }}
+                    >
+                      Remove
+                    </button>
+                  </div>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </div>
       )}
     </ImageUploading>
@@ -91,6 +93,7 @@ function ImageUploader({
 ImageUploader.propTypes = {
   images: PropTypes.arrayOf(PropTypes.object),
   onImageChange: PropTypes.func.isRequired,
+  onImageRemove: PropTypes.func.isRequired,
   maxImageNumber: PropTypes.number,
   acceptTypes: PropTypes.arrayOf(PropTypes.string),
 };
