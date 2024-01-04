@@ -32,7 +32,7 @@ function ImageUploader({
             <button
               className={clsx(
                 classes['image-uploader__button-upload'],
-                'mb-5',
+                'mt-4',
                 {
                   [classes['image-uploader__button-upload--dragging']]:
                     isDragging,
@@ -46,15 +46,20 @@ function ImageUploader({
             >
               Click or Drop Image here
             </button>
-            <button
-              className={clsx(classes['image-uploader__button-remove-all'])}
-              onClick={(event) => {
-                event.preventDefault();
-                onImageRemoveAll();
-              }}
-            >
-              Remove all images
-            </button>
+            {imageList?.length > 0 && (
+              <button
+                className={clsx(
+                  classes['image-uploader__button-remove-all'],
+                  'mt-5'
+                )}
+                onClick={(event) => {
+                  event.preventDefault();
+                  onImageRemoveAll();
+                }}
+              >
+                Remove all images
+              </button>
+            )}
           </div>
           {imageList?.length > 0 && (
             <div className={classes['image-uploader-images']}>

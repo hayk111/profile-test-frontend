@@ -1,12 +1,16 @@
 import React, { useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
+import toast from 'react-hot-toast';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
+import isNull from 'lodash/isNull';
 import RegisterFirstPart from '../components/register/RegisterFirstPart';
 import RegisterSecondPart from '../components/register/RegisterSecondPart';
 import { setFirstRegisterPart } from '../redux/slices/registerSlice';
+import { setUser } from '../redux/slices/userSlice';
+import { values } from '../values';
 
 const schema = yup.object().shape({
   email: yup
@@ -43,16 +47,12 @@ export default function SignupPage() {
     resolver: yupResolver(schema),
   });
   const [imagesData, setImagesData] = useState([]);
-  console.log('🚀 ~ SignupPage ~ imagesData:', imagesData);
   const [avatar, setAvatar] = useState(null);
   const { isFirstRegisterPartComplete, ...registerFirstPartData } = useSelector(
     (state) => state.register
   );
-  console.log(
-    '🚀 ~ SignupPage ~ registerFirstPartData:',
-    registerFirstPartData
-  );
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   function onImageChange(data) {
     setImagesData(
@@ -76,8 +76,8 @@ export default function SignupPage() {
     const file = event.target.files[0];
     const reader = new FileReader();
     reader.onloadend = () => {
-      const base64String = reader.result;
-      setAvatar(base64String);
+      const [, , , base64Data] = fileDataPartsRegex.exec(reader.result);
+      setAvatar({ base64Data, name: file.name, type: file.type });
     };
     if (file) {
       reader.readAsDataURL(file);
@@ -94,16 +94,42 @@ export default function SignupPage() {
   }
 
   async function onSubmit(data) {
-    console.log('🚀 ~ onSubmit ~ data:', data, isFirstRegisterPartComplete);
     if (isFirstRegisterPartComplete) {
       const result = await fetch(`${process.env.REACT_APP_API_URL}/register`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ ...registerFirstPartData, photos: imagesData }),
+        body: JSON.stringify({
+          ...registerFirstPartData,
+          ...(!isNull(avatar) && { avatar }),
+          photos: imagesData,
+        }),
       }).then((response) => response.json());
-      console.log('🚀 ~ onSubmit ~ result:', result);
+
+      if (result.error) {
+        toast.error(result.message);
+        return;
+      }
+
+      localStorage.setItem(values.storageKeys.accessToken, result.accessToken);
+
+      const resultUser = await fetch(
+        `${process.env.REACT_APP_API_URL}/users/me`,
+        {
+          headers: {
+            Authorization: `Bearer ${result.accessToken}`,
+          },
+        }
+      ).then((response) => response.json());
+
+      dispatch(setUser(resultUser));
+      navigate('/profile');
+      toast.success('Account created successfully');
+      setFirstRegisterPart({
+        ...registerFirstPartData,
+        isFirstRegisterPartComplete: false,
+      });
     } else {
       dispatch(
         setFirstRegisterPart({ ...data, isFirstRegisterPartComplete: true })
