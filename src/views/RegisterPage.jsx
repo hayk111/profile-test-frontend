@@ -36,7 +36,7 @@ const schema = yup.object().shape({
   role: yup.string().required('Role is required'),
 });
 
-const fileDataPartsRegex = /data:([^\/]+)\/([^;]+);base64,(.+)/;
+const fileDataPartsRegex = /data:([^/]+)\/([^;]+);base64,(.+)/;
 
 export default function SignupPage() {
   const {

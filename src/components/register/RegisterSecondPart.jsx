@@ -59,7 +59,7 @@ function RegisterSecondPart({
 }
 
 RegisterSecondPart.propTypes = {
-  avatar: PropTypes.object.isRequired,
+  avatar: PropTypes.oneOfType([PropTypes.object, PropTypes.oneOf([null])]),
   imagesData: PropTypes.array.isRequired,
   onAvatarChange: PropTypes.func.isRequired,
   onImageChange: PropTypes.func.isRequired,
