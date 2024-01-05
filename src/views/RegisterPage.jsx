@@ -11,6 +11,7 @@ import RegisterSecondPart from '../components/register/RegisterSecondPart';
 import { setFirstRegisterPart } from '../redux/slices/registerSlice';
 import { setUser } from '../redux/slices/userSlice';
 import { values } from '../values';
+import { registerRequest, usersMeRequest } from '../api';
 
 const schema = yup.object().shape({
   email: yup
@@ -100,17 +101,11 @@ export default function SignupPage() {
         return;
       }
 
-      const result = await fetch(`${process.env.REACT_APP_API_URL}/register`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          ...registerFirstPartData,
-          ...(!isNull(avatar) && { avatar }),
-          photos: imagesData,
-        }),
-      }).then((response) => response.json());
+      const result = await registerRequest({
+        ...registerFirstPartData,
+        ...(!isNull(avatar) && { avatar }),
+        photos: imagesData,
+      });
 
       if (result.error) {
         toast.error(result.message);
@@ -119,14 +114,7 @@ export default function SignupPage() {
 
       localStorage.setItem(values.storageKeys.accessToken, result.accessToken);
 
-      const resultUser = await fetch(
-        `${process.env.REACT_APP_API_URL}/users/me`,
-        {
-          headers: {
-            Authorization: `Bearer ${result.accessToken}`,
-          },
-        }
-      ).then((response) => response.json());
+      const resultUser = await usersMeRequest(result.accessToken);
       dispatch(setUser(resultUser));
       dispatch(
         setFirstRegisterPart({

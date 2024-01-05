@@ -1,13 +1,43 @@
-import React from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import isNull from 'lodash/isNull';
 import { values } from '../values';
-import { resetUser } from '../redux/slices/userSlice';
+import { resetUser, updateAvatar } from '../redux/slices/userSlice';
 import 'react-responsive-carousel/lib/styles/carousel.min.css';
 import { Carousel } from 'react-responsive-carousel';
+import { uploadAvatarRequest } from '../api';
+
+const fileDataPartsRegex = /data:([^/]+)\/([^;]+);base64,(.+)/;
 
 export default function ProfilePage() {
   const user = useSelector((state) => state.user);
+  const [avatar, setAvatar] = useState(null);
   const dispatch = useDispatch();
+  const fileInputRef = useRef(null);
+
+  useEffect(() => {
+    const accessToken = localStorage.getItem(values.storageKeys.accessToken);
+    if (!isNull(avatar) && accessToken) {
+      uploadAvatarRequest(accessToken, avatar).then((newAvatarUrl) => {
+        dispatch(updateAvatar(newAvatarUrl));
+      });
+    }
+  }, [avatar, dispatch]);
+
+  function handleAvatarClick() {
+    fileInputRef.current.click();
+  }
+
+  function handleFileChange(event) {
+    const file = event.target.files[0];
+    const reader = new FileReader();
+    reader.onloadend = async () => {
+      // Here you can send the base64 image to the server
+      const [, , , base64Data] = fileDataPartsRegex.exec(reader.result);
+      setAvatar({ base64Data, name: file.name, type: file.type });
+    };
+    reader.readAsDataURL(file);
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-blue-300">
@@ -16,7 +46,14 @@ export default function ProfilePage() {
           <img
             src={user.avatar}
             alt="Avatar"
-            className="rounded-full object-cover w-32 h-32 mx-auto mb-2"
+            className="rounded-full object-cover w-32 h-32 mx-auto mb-2 cursor-pointer hover:opacity-80 transition-opacity duration-800"
+            onClick={handleAvatarClick}
+          />
+          <input
+            type="file"
+            ref={fileInputRef}
+            style={{ display: 'none' }}
+            onChange={handleFileChange}
           />
           <h2 className="text-xl font-semibold">{`${user.fullName}`}</h2>
           <p className="text-gray-500">{user.role}</p>

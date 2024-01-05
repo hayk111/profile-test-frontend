@@ -6,6 +6,7 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import { setUser } from '../redux/slices/userSlice';
 import { values } from '../values';
+import { loginRequest } from '../api';
 
 const schema = yup.object().shape({
   email: yup
@@ -27,15 +28,7 @@ export default function LoginPage() {
   const navigate = useNavigate();
 
   async function onSubmit(data) {
-    const result = await fetch(`${process.env.REACT_APP_API_URL}/login`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        ...data,
-      }),
-    }).then((response) => response.json());
+    const result = await loginRequest(data);
 
     if (result.error) {
       toast.error(result.message);

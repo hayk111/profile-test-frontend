@@ -4,6 +4,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { values } from '../values';
 import { setUser } from '../redux/slices/userSlice';
+import { usersMeRequest } from '../api';
 
 function PrivatePage({ children }) {
   const user = useSelector((state) => state.user);
@@ -23,15 +24,7 @@ function PrivatePage({ children }) {
     }
 
     const fetchUser = async () => {
-      const resultUser = await fetch(
-        `${process.env.REACT_APP_API_URL}/users/me`,
-        {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          },
-        }
-      ).then((response) => response.json());
-
+      const resultUser = await usersMeRequest(accessToken);
       dispatch(setUser(resultUser));
     };
 
