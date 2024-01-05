@@ -95,6 +95,11 @@ export default function SignupPage() {
 
   async function onSubmit(data) {
     if (isFirstRegisterPartComplete) {
+      if (imagesData.length < 4) {
+        toast.error('At least 4 photos must be uploaded');
+        return;
+      }
+
       const result = await fetch(`${process.env.REACT_APP_API_URL}/register`, {
         method: 'POST',
         headers: {
@@ -122,14 +127,15 @@ export default function SignupPage() {
           },
         }
       ).then((response) => response.json());
-
       dispatch(setUser(resultUser));
+      dispatch(
+        setFirstRegisterPart({
+          ...registerFirstPartData,
+          isFirstRegisterPartComplete: false,
+        })
+      );
       navigate('/profile');
       toast.success('Account created successfully');
-      setFirstRegisterPart({
-        ...registerFirstPartData,
-        isFirstRegisterPartComplete: false,
-      });
     } else {
       dispatch(
         setFirstRegisterPart({ ...data, isFirstRegisterPartComplete: true })
@@ -144,6 +150,7 @@ export default function SignupPage() {
         <form onSubmit={handleSubmit(onSubmit)}>
           {isFirstRegisterPartComplete ? (
             <RegisterSecondPart
+              avatar={avatar}
               imagesData={imagesData}
               onAvatarChange={onAvatarChange}
               onImageChange={onImageChange}

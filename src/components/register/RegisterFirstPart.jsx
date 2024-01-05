@@ -1,4 +1,6 @@
-export default function RegisterFirstPart({ register, errors }) {
+import PropTypes from 'prop-types';
+
+function RegisterFirstPart({ register, errors }) {
   return (
     <>
       <div className="mb-4">
@@ -112,3 +114,10 @@ export default function RegisterFirstPart({ register, errors }) {
     </>
   );
 }
+
+RegisterFirstPart.propTypes = {
+  register: PropTypes.func.isRequired,
+  errors: PropTypes.object.isRequired,
+};
+
+export default RegisterFirstPart;

@@ -29,7 +29,7 @@
 }
 
 .image-uploader-images {
-  max-height: 400px;
+  max-height: 350px;
   align-items: center;
   background-color: #eee;
   border: 2px solid theme("colors.white");

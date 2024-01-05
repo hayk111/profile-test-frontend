@@ -1,6 +1,9 @@
+import PropTypes from 'prop-types';
 import ImageUploader from '../../common/ImageUploader';
+import { values } from '../../values';
 
-export default function RegisterSecondPart({
+function RegisterSecondPart({
+  avatar,
   imagesData,
   onAvatarChange,
   onImageChange,
@@ -23,6 +26,21 @@ export default function RegisterSecondPart({
           className="mt-1 p-2 w-full border rounded-md"
           onChange={onAvatarChange}
         />
+        <div className="flex justify-center mt-4">
+          {avatar ? (
+            <img
+              src={`data:${avatar.type};base64,${avatar.base64Data}`}
+              alt="Avatar"
+              className="object-cover w-[100px] h-[100px] rounded-full"
+            />
+          ) : (
+            <img
+              src={values.defaultAvatar}
+              alt="Avatar"
+              className="object-cover w-[100px] h-[100px] rounded-full"
+            />
+          )}
+        </div>
       </div>
       <div className="mb-4">
         <ImageUploader
@@ -30,7 +48,22 @@ export default function RegisterSecondPart({
           onImageRemove={onImageRemove}
           images={imagesData}
         />
+        {imagesData.length < 4 && (
+          <p role="alert" className="text-center text-sm text-red-400 mt-1">
+            At least 4 photos must be uploaded
+          </p>
+        )}
       </div>
     </>
   );
 }
+
+RegisterSecondPart.propTypes = {
+  avatar: PropTypes.object.isRequired,
+  imagesData: PropTypes.array.isRequired,
+  onAvatarChange: PropTypes.func.isRequired,
+  onImageChange: PropTypes.func.isRequired,
+  onImageRemove: PropTypes.func.isRequired,
+};
+
+export default RegisterSecondPart;

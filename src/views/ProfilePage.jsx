@@ -7,7 +7,6 @@ import { Carousel } from 'react-responsive-carousel';
 
 export default function ProfilePage() {
   const user = useSelector((state) => state.user);
-  console.log('🚀 ~ ProfilePage ~ user:', user);
   const dispatch = useDispatch();
 
   return (
@@ -17,7 +16,7 @@ export default function ProfilePage() {
           <img
             src={user.avatar}
             alt="Avatar"
-            className="rounded-full object-cover w-[100px] h-[100px] mx-auto mb-2"
+            className="rounded-full object-cover w-32 h-32 mx-auto mb-2"
           />
           <h2 className="text-xl font-semibold">{`${user.fullName}`}</h2>
           <p className="text-gray-500">{user.role}</p>
@@ -32,7 +31,7 @@ export default function ProfilePage() {
           </button>
         </div>
         <div className="mt-8">
-          {user.photos.length > 0 ? (
+          {user.photos?.length > 0 ? (
             <Carousel
               infiniteLoop
               autoPlay

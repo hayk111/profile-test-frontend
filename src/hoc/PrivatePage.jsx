@@ -1,10 +1,11 @@
 import React, { useEffect } from 'react';
+import PropTypes from 'prop-types';
 import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { values } from '../values';
 import { setUser } from '../redux/slices/userSlice';
 
-export default function PrivatePage({ children }) {
+function PrivatePage({ children }) {
   const user = useSelector((state) => state.user);
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -39,3 +40,9 @@ export default function PrivatePage({ children }) {
 
   return <>{children}</>;
 }
+
+PrivatePage.propTypes = {
+  children: PropTypes.node,
+};
+
+export default PrivatePage;

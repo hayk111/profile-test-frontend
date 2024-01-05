@@ -1,8 +1,9 @@
 import React, { useEffect } from 'react';
+import PropTypes from 'prop-types';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 
-export default function PublicPage({ children }) {
+function PublicPage({ children }) {
   const user = useSelector((state) => state.user);
   const navigate = useNavigate();
 
@@ -14,3 +15,9 @@ export default function PublicPage({ children }) {
 
   return <>{children}</>;
 }
+
+PropTypes.PublicPage = {
+  children: PropTypes.node,
+};
+
+export default PublicPage;
