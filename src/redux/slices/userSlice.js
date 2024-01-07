@@ -4,6 +4,7 @@ const initialState = {
   fullName: '',
   email: '',
   role: 'user',
+  active: true,
   avatar: '',
   photos: [],
 };
@@ -16,6 +17,7 @@ export const userSlice = createSlice({
       state.fullName = action.payload.fullName;
       state.email = action.payload.email;
       state.role = action.payload.role;
+      state.active = action.payload.active;
       state.avatar = action.payload.avatar;
       state.photos = action.payload.photos;
     },
@@ -23,6 +25,7 @@ export const userSlice = createSlice({
       state.fullName = '';
       state.email = '';
       state.role = 'user';
+      state.active = true;
       state.avatar = '';
       state.photos = [];
     },

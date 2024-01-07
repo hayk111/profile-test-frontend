@@ -5,6 +5,7 @@ import { useForm } from 'react-hook-form';
 import toast from 'react-hot-toast';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
+import clsx from 'clsx';
 import isNull from 'lodash/isNull';
 import RegisterFirstPart from '../components/register/RegisterFirstPart';
 import RegisterSecondPart from '../components/register/RegisterSecondPart';
@@ -35,6 +36,7 @@ const schema = yup.object().shape({
     .max(25, "Last name can't exceed 25 characters")
     .required('Last name is required'),
   role: yup.string().required('Role is required'),
+  active: yup.boolean().required('Active is required'),
 });
 
 const fileDataPartsRegex = /data:([^/]+)\/([^;]+);base64,(.+)/;
@@ -49,6 +51,8 @@ export default function SignupPage() {
   });
   const [imagesData, setImagesData] = useState([]);
   const [avatar, setAvatar] = useState(null);
+  const [isRegisterLoading, setIsRegisterLoading] = useState(false);
+
   const { isFirstRegisterPartComplete, ...registerFirstPartData } = useSelector(
     (state) => state.register
   );
@@ -101,6 +105,7 @@ export default function SignupPage() {
         return;
       }
 
+      setIsRegisterLoading(true);
       const result = await registerRequest({
         ...registerFirstPartData,
         ...(!isNull(avatar) && { avatar }),
@@ -109,6 +114,7 @@ export default function SignupPage() {
 
       if (result.error) {
         toast.error(result.message);
+        setIsRegisterLoading(false);
         return;
       }
 
@@ -122,6 +128,7 @@ export default function SignupPage() {
           isFirstRegisterPartComplete: false,
         })
       );
+      setIsRegisterLoading(false);
       navigate('/profile');
       toast.success('Account created successfully');
     } else {
@@ -160,9 +167,18 @@ export default function SignupPage() {
               )}
               <button
                 type="submit"
-                className="bg-blue-500 text-white px-4 py-2 rounded-md"
+                className={clsx(
+                  'bg-blue-500 text-white px-4 py-2 rounded-md relative',
+                  { 'opacity-50 cursor-not-allowed': isRegisterLoading }
+                )}
+                disabled={isRegisterLoading}
               >
-                {isFirstRegisterPartComplete ? 'Sign Up' : 'Next'}
+                {isRegisterLoading && (
+                  <span className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2">
+                    <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-white"></div>
+                  </span>
+                )}
+                {isFirstRegisterPartComplete ? 'Register' : 'Next'}
               </button>
             </div>
             <span className="text-sm text-gray-600">

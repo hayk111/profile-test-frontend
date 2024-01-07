@@ -6,6 +6,7 @@ const initialState = {
   email: '',
   password: '',
   role: 'user',
+  active: true,
   isFirstRegisterPartComplete: false,
 };
 
@@ -19,6 +20,7 @@ export const registerSlice = createSlice({
       state.email = action.payload.email;
       state.password = action.payload.password;
       state.role = action.payload.role;
+      state.active = action.payload.active;
       state.isFirstRegisterPartComplete =
         action.payload.isFirstRegisterPartComplete;
     },

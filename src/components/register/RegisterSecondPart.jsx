@@ -1,4 +1,6 @@
+import React, { useRef } from 'react';
 import PropTypes from 'prop-types';
+import isNull from 'lodash/isNull';
 import ImageUploader from '../../common/ImageUploader';
 import { values } from '../../values';
 
@@ -9,38 +11,40 @@ function RegisterSecondPart({
   onImageChange,
   onImageRemove,
 }) {
+  const fileInputRef = useRef(null);
+
+  function handleAvatarClick() {
+    fileInputRef.current.click();
+  }
+
   return (
     <>
       <div className="mb-4">
         <label
           htmlFor="avatar"
-          className="block text-sm font-medium text-gray-700"
+          className="text-center mb-4 block font-medium text-gray-800"
         >
-          Avatar
+          Pick an avatar or use the default one
         </label>
-        <input
-          type="file"
+        <img
+          src={
+            isNull(avatar)
+              ? values.defaultAvatar
+              : `data:${avatar.type};base64,${avatar.base64Data}`
+          }
           id="avatar"
           name="avatar"
+          alt="Avatar"
+          className="rounded-full object-cover w-[100px] h-[100px] mx-auto mb-2 cursor-pointer hover:opacity-80 transition-opacity duration-800"
+          onClick={handleAvatarClick}
+        />
+        <input
+          type="file"
+          ref={fileInputRef}
           accept="image/*"
-          className="mt-1 p-2 w-full border rounded-md"
+          style={{ display: 'none' }}
           onChange={onAvatarChange}
         />
-        <div className="flex justify-center mt-4">
-          {avatar ? (
-            <img
-              src={`data:${avatar.type};base64,${avatar.base64Data}`}
-              alt="Avatar"
-              className="object-cover w-[100px] h-[100px] rounded-full"
-            />
-          ) : (
-            <img
-              src={values.defaultAvatar}
-              alt="Avatar"
-              className="object-cover w-[100px] h-[100px] rounded-full"
-            />
-          )}
-        </div>
       </div>
       <div className="mb-4">
         <ImageUploader

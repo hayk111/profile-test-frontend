@@ -111,6 +111,23 @@ function RegisterFirstPart({ register, errors }) {
           </p>
         )}
       </div>
+      <div className="mb-4">
+        <label
+          htmlFor="role"
+          className="block text-sm font-medium text-gray-700"
+        >
+          Active
+        </label>
+        <input
+          {...register('active')}
+          type="checkbox"
+          id="active"
+          name="active"
+          defaultChecked={true}
+          className="mt-1 p-2 cursor-pointer rounded-md"
+          style={{ transform: 'scale(1.2)' }}
+        />
+      </div>
     </>
   );
 }
