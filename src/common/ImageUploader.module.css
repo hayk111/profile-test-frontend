@@ -5,14 +5,14 @@
   border-radius: theme("spacing.5");
   background-color: #acdad0;
   transition: transform 0.5s ease;
+}
 
-  &:hover {
-    transform: scale(1.05);
-  }
+.image-uploader__button-upload:hover {
+  transform: scale(1.05);
+}
 
-  &.image-uploader__button-upload--dragging {
-    background-color: theme("colors.indigo.200");
-  }
+.image-uploader__button-upload.image-uploader__button-upload--dragging {
+  background-color: theme("colors.indigo.200");
 }
 
 .image-uploader__button-remove-all {
@@ -22,10 +22,10 @@
   border-radius: theme("spacing.5");
   background-color: theme("colors.red.400");
   color: theme("colors.white");
+}
 
-  &:hover {
-    background-color: theme("colors.red.500");
-  }
+.image-uploader__button-remove-all:hover {
+  background-color: theme("colors.red.500");
 }
 
 .image-uploader-images {
@@ -38,10 +38,10 @@
   overflow-y: auto;
   display: flex;
   flex-direction: column;
+}
 
-  &::-webkit-scrollbar {
-    display: none;
-  }
+.image-uploader-images::-webkit-scrollbar {
+  display: none;
 }
 
 .image-uploader__image {
