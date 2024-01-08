@@ -36,7 +36,9 @@ export default function ProfilePage() {
       const [, , , base64Data] = fileDataPartsRegex.exec(reader.result);
       setAvatar({ base64Data, name: file.name, type: file.type });
     };
-    reader.readAsDataURL(file);
+    if (file) {
+      reader.readAsDataURL(file);
+    }
   }
 
   return (
