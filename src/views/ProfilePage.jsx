@@ -32,7 +32,6 @@ export default function ProfilePage() {
     const file = event.target.files[0];
     const reader = new FileReader();
     reader.onloadend = async () => {
-      // Here you can send the base64 image to the server
       const [, , , base64Data] = fileDataPartsRegex.exec(reader.result);
       setAvatar({ base64Data, name: file.name, type: file.type });
     };
